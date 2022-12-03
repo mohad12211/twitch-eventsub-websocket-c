@@ -64,6 +64,7 @@ extern const streamer streamers[];
 extern const int streamers_length;
 extern char *oauth;
 extern char *bot_token;
+extern char *client_id;
 extern int enable_log;
 
 void errout(const char *file, const char *line, const char *func, const char *format, ...);

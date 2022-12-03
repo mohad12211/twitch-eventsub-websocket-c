@@ -3,6 +3,7 @@
 SSL_CTX *ssl_ctx;
 char *oauth;
 char *bot_token;
+char *client_id;
 int enable_log;
 
 void init_ssl(void) {
@@ -17,6 +18,8 @@ void init_keys(void) {
   if ((oauth = getenv("TWITCH_OAUTH")) == NULL)
     ERROUT("No TWITCH_OAUTH provided");
   if ((bot_token = getenv("DISCORD_TOKEN")) == NULL)
+    ERROUT("No DISCORD_TOKEN provided");
+  if ((client_id = getenv("CLIENT_ID")) == NULL)
     ERROUT("No DISCORD_TOKEN provided");
   enable_log = getenv("ENABLE_LOG") != NULL;
   oauth = strdup(oauth);
@@ -81,19 +84,19 @@ void create_eventsub(char *session_id, char *broadcaster_user_id) {
 
   static const char port[] = "443";
   static const char host[] = "api.twitch.tv";
-  // TODO: make client-id env var
   static const char format[] = "POST /helix/eventsub/subscriptions HTTP/1.0\r\n"
                                "Host: api.twitch.tv\r\n"
                                "authorization: Bearer %s\r\n"
-                               "client-id: c2zhhicmz8fsgfr6d2kcdqwhfq7y4n\r\n"
+                               "client-id: %s\r\n"
                                "content-type: application/json\r\n"
                                "content-length: %d\r\n\r\n"
                                "%s";
   char *data = cJSON_PrintUnformatted(data_json);
   int content_length = strlen(data);
-  int request_length = strlen(format) + strlen(oauth) + (int)(floor(log10(content_length)) + strlen(data));
+  int request_length =
+      strlen(format) + strlen(oauth) + strlen(client_id) + (int)(floor(log10(content_length)) + strlen(data));
   char request[request_length + 1];
-  sprintf(request, format, oauth, content_length, data);
+  sprintf(request, format, oauth, client_id, content_length, data);
   request_length = strlen(request); // get exact length
 
   int sockfd = get_sockfd(host, port);
@@ -221,15 +224,14 @@ void get_channel_information(char *broadcaster_user_id, char *title, char *game)
 
   static const char port[] = "443";
   static const char host[] = "api.twitch.tv";
-  // TODO: make client-id env var
   static const char format[] = "GET /helix/channels?broadcaster_id=%s HTTP/1.0\r\n"
                                "Host: api.twitch.tv\r\n"
                                "authorization: Bearer %s\r\n"
                                "accept: */*\r\n"
-                               "client-id: c2zhhicmz8fsgfr6d2kcdqwhfq7y4n\r\n\r\n";
-  int request_length = strlen(format) + strlen(broadcaster_user_id) + strlen(oauth);
+                               "client-id: %s\r\n\r\n";
+  int request_length = strlen(format) + strlen(broadcaster_user_id) + strlen(oauth) + strlen(client_id);
   char request[request_length + 1];
-  sprintf(request, format, broadcaster_user_id, oauth);
+  sprintf(request, format, broadcaster_user_id, oauth, client_id);
   request_length = strlen(request); // get exact length
 
   int sockfd = get_sockfd(host, port);
@@ -259,15 +261,14 @@ void get_profile_image(char *broadcaster_name, char *profile_image) {
 
   static const char port[] = "443";
   static const char host[] = "api.twitch.tv";
-  // TODO: make client-id env var
   static const char format[] = "GET /helix/users?login=%s HTTP/1.0\r\n"
                                "Host: api.twitch.tv\r\n"
                                "authorization: Bearer %s\r\n"
                                "accept: */*\r\n"
-                               "client-id: c2zhhicmz8fsgfr6d2kcdqwhfq7y4n\r\n\r\n";
-  int request_length = strlen(format) + strlen(broadcaster_name) + strlen(oauth);
+                               "client-id: %s\r\n\r\n";
+  int request_length = strlen(format) + strlen(broadcaster_name) + strlen(oauth) + strlen(client_id);
   char request[request_length + 1];
-  sprintf(request, format, broadcaster_name, oauth);
+  sprintf(request, format, broadcaster_name, oauth, client_id);
   request_length = strlen(request); // get exact length
 
   int sockfd = get_sockfd(host, port);
