@@ -1,6 +1,6 @@
 #include "websocket.h"
 
-#define DEFAULT_URL "wss://eventsub-beta.wss.twitch.tv/ws"
+#define DEFAULT_URL "wss://eventsub.wss.twitch.tv/ws"
 
 wsclient *wsclient_new(char *url) {
   wsclient *client = malloc(sizeof(wsclient));
