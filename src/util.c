@@ -20,7 +20,7 @@ void init_keys(void) {
   if ((bot_token = getenv("DISCORD_TOKEN")) == NULL)
     ERROUT("No DISCORD_TOKEN provided");
   if ((client_id = getenv("CLIENT_ID")) == NULL)
-    ERROUT("No DISCORD_TOKEN provided");
+    ERROUT("No CLIENT_ID provided");
   enable_log = getenv("ENABLE_LOG") != NULL;
   oauth = strdup(oauth);
 }
