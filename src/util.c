@@ -1,5 +1,7 @@
 #include "websocket.h"
 
+#define TWITCH_HOSTNAME "eventsub.wss.twitch.tv"
+
 SSL_CTX *ssl_ctx;
 char *oauth;
 char *bot_token;
@@ -27,6 +29,7 @@ void init_keys(void) {
 
 SSL *get_ssl_from_sockfd(int sockfd) {
   SSL *ssl = SSL_new(ssl_ctx);
+  SSL_set_tlsext_host_name(ssl, TWITCH_HOSTNAME);
   if (ssl == NULL)
     ERROUT("Error in ssl_new");
   if (SSL_set_fd(ssl, sockfd) != 1)
