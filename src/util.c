@@ -329,8 +329,10 @@ void LOG(char *fmt, ...) {
 
 void errout(const char *file, const char *line, const char *func, const char *format, ...) {
   int errno_save;
+  int ssl_error_save;
   va_list ap;
   errno_save = errno;
+  ssl_error_save = ERR_get_error();
 
   fprintf(stdout, "[ERROR] %s:%s:%s() ", file, line, func);
   va_start(ap, format);
@@ -344,8 +346,8 @@ void errout(const char *file, const char *line, const char *func, const char *fo
     fflush(stdout);
   }
 
-  if (ERR_get_error() != 0) {
-    fprintf(stdout, "(ssl_error) : %s\n", ERR_error_string(ERR_get_error(), NULL));
+  if (ssl_error_save != 0) {
+    fprintf(stdout, "(ssl_error) : %s\n", ERR_error_string(ssl_error_save, NULL));
     fprintf(stdout, "\n");
     fflush(stdout);
   }
